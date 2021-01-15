@@ -28,3 +28,53 @@ class RegistrationForm(FlaskForm):
         user = Login.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')  
+
+class Material(FlaskForm):
+    name = StringField('Name',
+                        validators=[DataRequired()])
+    brand = StringField('Brand', validators=[DataRequired()])
+    price = StringField('Price', validators=[DataRequired()])
+    desc = StringField('Description', validators=[DataRequired()])
+    pic = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png','jpeg'])])
+    submit = SubmitField('Submit')
+
+class Address(FlaskForm):
+    name = StringField('Name',render_kw={"placeholder":"NAME"},
+                        validators=[DataRequired()])
+    phone = StringField('Mobile',render_kw={"placeholder":"MOBILE"})
+    address = StringField('Delivery Address',render_kw={"placeholder":"DELIVERY ADDRESS"},
+                        validators=[DataRequired()])
+    qnty = StringField('Quantity',render_kw={"placeholder":"QNTY"})
+    submit = SubmitField('continue')
+
+
+
+class Creditcard(FlaskForm):
+    name = StringField('Name',render_kw={"placeholder":"Name"},
+                        validators=[DataRequired()])
+    number = StringField('number',render_kw={"placeholder":".... .... .... ...."},validators=[DataRequired()])
+    cvv = StringField(' cvv',render_kw={"placeholder":"..."},
+                        validators=[DataRequired()])
+    date = StringField('date',render_kw={"placeholder":"MM/YY"},
+                        validators=[DataRequired()])
+    submit = SubmitField('Make A Payment')
+
+class Paypal(FlaskForm):
+    number = StringField('number',render_kw={"placeholder":"xxxx xxxx xxxx xxxx"},
+                        validators=[DataRequired()])
+    name = StringField('Name',render_kw={"placeholder":"Name"},validators=[DataRequired()])
+    cvv = StringField(' cvv',render_kw={"placeholder":"xxx"},
+                        validators=[DataRequired()])
+    date = StringField('date',render_kw={"placeholder":"MM/YY"},
+                        validators=[DataRequired()])
+    submit = SubmitField('Proceed Payment')
+
+class Cod(FlaskForm):
+    submit = SubmitField('Make a payment')
