@@ -82,3 +82,7 @@ class Pay(db.Model):
     cvv = db.Column(db.String(200))
     validdate = db.Column(db.String(200))
 
+class Gallery(db.Model):
+    id= db.Column(db.Integer, primary_key=True)
+    name= db.Column(db.VARCHAR)
+    img = db.Column(db.String(20), nullable=False, default='default.jpg')

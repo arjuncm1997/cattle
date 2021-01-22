@@ -78,3 +78,13 @@ class Paypal(FlaskForm):
 
 class Cod(FlaskForm):
     submit = SubmitField('Make a payment')
+
+class Imageadd(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=5, max=40)])
+    pic = FileField('Upload Picture', validators=[DataRequired(),FileAllowed(['jpg', 'png','jpeg'])])
+    submit = SubmitField('Save')
+
+class Imageupdate(FlaskForm):
+    name = StringField('Name',validators=[DataRequired(), Length(min=5, max=40)])
+    pic = FileField('Upload Picture', validators=[FileAllowed(['jpg', 'png','jpeg'])])
+    submit = SubmitField('Save')

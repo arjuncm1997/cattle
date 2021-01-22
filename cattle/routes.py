@@ -11,7 +11,8 @@ from flask_mail import Message
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    pro = Materials.query.all()
+    return render_template("index.html",pro=pro)
 
 @app.route('/about')
 def about():
@@ -414,3 +415,81 @@ def sstatus(id):
         db.session.commit()
         return redirect('/sordered')
     return render_template("sordered.html",mat=pro)
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect('/')
+
+
+@app.route('/imageadd',methods=['POST','GET'])
+def imageadd():
+    form=Imageadd()
+
+    if form.validate_on_submit():
+
+        if form.pic.data:
+            pic_file = save_picture(form.pic.data)
+            view = pic_file
+        print(view)  
+    
+        gallery = Gallery(name=form.name.data,img=view )
+       
+        db.session.add(gallery)
+        db.session.commit()
+        print(gallery)
+        flash('image added')
+        return redirect('/viewimage')
+            
+    return render_template('imageadd.html',form=form)
+
+@app.route('/viewimage')
+def viewimage():
+    gallery=Gallery.query.all()
+    return render_template('viewimage.html',gallery=gallery)
+
+
+@app.route("/view/<int:id>", methods=['GET', 'POST'])
+def update_post(id):
+    gallery = Gallery.query.get_or_404(id)
+    form = Imageupdate()
+    if form.validate_on_submit():
+        if form.pic.data:
+            picture_file = save_picture(form.pic.data)
+            gallery.img = picture_file
+        gallery.name = form.name.data
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect('/viewimage')
+    elif request.method == 'GET':
+        form.name.data = gallery.name
+    image_file = url_for('static', filename='pics/' + gallery.img)
+    return render_template('galleryupdate.html',form=form)
+
+@app.route("/view/<int:id>/delete")
+def deleteimage(id):
+    gallery =Gallery.query.get_or_404(id)
+    db.session.delete(gallery)
+    db.session.commit()
+    flash('image has been deleted!', 'success')
+    return redirect('/viewimage')
+
+@app.route('/pfeedbackview')
+def pfeedbackview():
+    feedback1=Feedback.query.filter_by(usertype='public').all()
+    return render_template("pfeedbackview.html",feedback=feedback1)
+
+@app.route('/ufeedbackview')
+def ufeedbackview():
+    feedback1=Feedback.query.filter_by(usertype='user').all()
+    return render_template("ufeedbackview.html",feedback=feedback1)
+
+@app.route('/sfeedbackview')
+def sfeedbackview():
+    feedback1=Feedback.query.filter_by(usertype='seller').all()
+    return render_template("sfeedbackview.html",feedback=feedback1)
+
+@app.route('/aproductview')
+def aproductview():
+    user = Materials.query.all()
+    return render_template("aproductview.html",user=user)
