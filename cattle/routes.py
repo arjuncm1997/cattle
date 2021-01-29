@@ -541,3 +541,42 @@ def sprofile(id):
         form.pic.data = login.image_file
     image_file = url_for('static', filename='pics/' + login.image_file)
     return render_template("sprofile.html",form=form)
+
+
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('Password Reset Request',
+                  recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('resettoken', token=token, _external=True)}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+
+
+@app.route("/resetrequest", methods=['GET', 'POST'])
+def resetrequest():
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = Login.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect('/login')
+    return render_template('resetrequest.html', title='Reset Password', form=form)
+
+
+@app.route("/resetpassword/<token>", methods=['GET', 'POST'])
+def resettoken(token):
+    user = Login.verify_reset_token(token)
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect('/resetrequest')
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        flash('Your password has been updated! You are now able to log in', 'success')
+        return redirect('/login')
+    return render_template('resetpassword.html', title='Reset Password', form=form)
