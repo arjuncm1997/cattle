@@ -493,3 +493,51 @@ def sfeedbackview():
 def aproductview():
     user = Materials.query.all()
     return render_template("aproductview.html",user=user)
+
+@app.route('/uprofile/<int:id>',methods=['GET','POST'])
+def uprofile(id):
+    form = Profile()
+    login = Login.query.get_or_404(id)
+    if form.validate_on_submit():
+        if form.pic.data:
+            picture_file = save_picture(form.pic.data)
+            login.image_file = picture_file
+        login.username = form.username.data
+        login.address = form.address.data
+        login.phone = form.phone.data
+        login.email = form.email.data
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect('/uindex')
+    elif request.method == 'GET':
+        form.username.data = login.username
+        form.address.data = login.address
+        form.phone.data = login.phone
+        form.email.data = login.email
+        form.pic.data = login.image_file
+    image_file = url_for('static', filename='pics/' + login.image_file)
+    return render_template("uprofile.html",form=form)
+
+@app.route('/sprofile/<int:id>',methods=['GET','POST'])
+def sprofile(id):
+    form = Profile()
+    login = Login.query.get_or_404(id)
+    if form.validate_on_submit():
+        if form.pic.data:
+            picture_file = save_picture(form.pic.data)
+            login.image_file = picture_file
+        login.username = form.username.data
+        login.address = form.address.data
+        login.phone = form.phone.data
+        login.email = form.email.data
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect('/sindex')
+    elif request.method == 'GET':
+        form.username.data = login.username
+        form.address.data = login.address
+        form.phone.data = login.phone
+        form.email.data = login.email
+        form.pic.data = login.image_file
+    image_file = url_for('static', filename='pics/' + login.image_file)
+    return render_template("sprofile.html",form=form)
